@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MessageSquare, Share2, LogOut, Inbox, Loader2 } from 'lucide-react'
 import Link from 'next/link'
@@ -9,7 +9,7 @@ import MessageCard from '@/components/messages/MessageCard'
 import { getMessagesByUsername, deleteMessage, subscribeToMessages } from '@/lib/supabase/messages'
 import type { Message } from '@/lib/supabase/types'
 
-export default function DashboardPage() {
+function DashboardContent() {
   const searchParams = useSearchParams()
   const username = searchParams.get('username') || ''
   const [messages, setMessages] = useState<Message[]>([])
@@ -190,6 +190,25 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 text-purple-500 animate-spin mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">
+              Chargement du tableau de bord...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   )
 }
 
